@@ -1,8 +1,15 @@
 # Load required libraries
+install.packages("devtools")
+install.packages("ggplot2")
+install.packages("nnet")
+install.packages("dplyr")
+
 library(ggplot2)
 library(nnet)       # For multinomial logit
 library(dplyr)
 
+# just install the downscalr package
+devtools::install_github("tkrisztin/downscalr", ref="HEAD", repos = "http://cran.us.r-project.org")
 
 set.seed(42)        # For reproducibility
 
@@ -178,16 +185,6 @@ for (i in 1:n) {
 }
 Y_matrix <- as.matrix(Y_matrix)
 
-test <- downscalr::mnlogit(X, Y_matrix, baseline = 1)
+res.MNL <- downscalr::mnlogit(X, Y_matrix, baseline = 1)
 
-apply(test$postb,c(1,2),mean)
-
-
-
-
-
-
-
-
-
-
+apply(res.MNL$postb,c(1,2),mean)

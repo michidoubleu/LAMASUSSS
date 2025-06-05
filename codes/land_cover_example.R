@@ -1,5 +1,10 @@
 set.seed(123)
 
+library(raster)
+library(ggplot2)
+library(nnet)
+library(gridExtra)
+
 ###### start with coordiates of a grid
 long <-  rep(seq(0.5,19.5,1),20)
 lat <- rep(seq(0.5,19.5,1),each=20)
@@ -19,7 +24,7 @@ xyz <- cbind(xyz, X.art)
 
 
 plot.X.art <- rasterFromXYZ(xyz[,c(1,2,3)])
-limits1 = c(,)#### which limits would make sense now?
+#limits1 = c(,)#### which limits would make sense now?
 plot(plot.X.art)
 
 
@@ -81,8 +86,6 @@ TT <- print(table(True = data_mnl$Y, Predicted = pred_class))
 round(TT/rowSums(TT)*100,0)
 
 
-
-
 # Create a data frame with the values you want to plot — in this case, longitude
 df <- data.frame(
   long = long,
@@ -123,3 +126,21 @@ B <- ggplot(df, aes(x = long, y = lat, fill = actual)) +
 
 grid.arrange(A,B, nrow = 1,
              top = "Predicted (left) vs actual (right)")
+
+
+
+
+
+
+
+X_new <- as.matrix(cbind(X1_mnl,X2_mnl,X3_mnl))
+Y <- matrix(0, nrow = nrow(X_new), ncol = ncol(probs))
+
+for (i in 1:nrow(Y)) {
+  Y[i, which(levels(Y_mnl) == Y_mnl[i])] <- 1
+}
+Y <- as.matrix(Y)
+
+res.lc <- downscalr::mnlogit(X_new, Y, baseline = 1)
+beta <- apply(res.lc$postb,c(1,2),mean)
+
